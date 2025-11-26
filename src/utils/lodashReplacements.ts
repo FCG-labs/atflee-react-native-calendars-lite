@@ -100,37 +100,39 @@ export const inRange = (value: number, start: number, end?: number): boolean => 
 export const times = <T>(n: number, iteratee: (index: number) => T): T[] =>
   Array.from({ length: n }, (_, i) => iteratee(i));
 
-export const flatten = <T>(array: (T | T[])[]): T[] =>
-  array.flat() as T[];
+export const flatten = <T>(array: (T | T[])[] | null | undefined): T[] =>
+  (array ?? []).flat() as T[];
 
-export const dropRight = <T>(array: T[], n = 1): T[] =>
-  n >= array.length ? [] : array.slice(0, -n);
+export const dropRight = <T>(array: T[] | null | undefined, n = 1): T[] => {
+  if (!array) return [];
+  return n >= array.length ? [] : array.slice(0, -n);
+};
 
 export const findIndex = <T>(
-  array: T[],
+  array: T[] | null | undefined,
   predicate: (value: T, index: number, array: T[]) => boolean
-): number => array.findIndex(predicate);
+): number => (array ?? []).findIndex(predicate);
 
 export const filter = <T>(
-  array: T[],
+  array: T[] | null | undefined,
   predicate: (value: T, index: number, array: T[]) => boolean
-): T[] => array.filter(predicate);
+): T[] => (array ?? []).filter(predicate);
 
 export const map = <T, R>(
-  array: T[],
+  array: T[] | null | undefined,
   iteratee: (value: T, index: number, array: T[]) => R
-): R[] => array.map(iteratee);
+): R[] => (array ?? []).map(iteratee);
 
 export const some = <T>(
-  array: T[],
+  array: T[] | null | undefined,
   predicate: (value: T, index: number, array: T[]) => boolean
-): boolean => array.some(predicate);
+): boolean => (array ?? []).some(predicate);
 
-export const includes = <T>(array: T[], value: T): boolean =>
-  array.includes(value);
+export const includes = <T>(array: T[] | null | undefined, value: T): boolean =>
+  array?.includes(value) ?? false;
 
-export const min = (array: number[]): number | undefined =>
-  array.length ? Math.min(...array) : undefined;
+export const min = (array: number[] | null | undefined): number | undefined =>
+  array?.length ? Math.min(...array) : undefined;
 
 export const pickBy = <T extends Record<string, unknown>>(
   obj: T,
