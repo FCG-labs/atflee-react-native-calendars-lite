@@ -1,4 +1,4 @@
-import sortBy from 'lodash/sortBy';
+import {sortBy} from '../../utils/lodashReplacements';
 import * as uut from '../Packer';
 
 describe('Timeline Packer utils', () => {

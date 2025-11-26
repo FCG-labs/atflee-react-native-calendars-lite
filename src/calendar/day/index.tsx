@@ -1,6 +1,4 @@
-import omit from 'lodash/omit';
-import isEqual from 'lodash/isEqual';
-import some from 'lodash/some';
+import {omit,isEqual,some} from '../../utils/lodashReplacements';
 import XDate from 'xdate';
 import React, {useMemo} from 'react';
 

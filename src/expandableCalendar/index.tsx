@@ -1,7 +1,4 @@
-import first from 'lodash/first';
-import isFunction from 'lodash/isFunction';
-import isNumber from 'lodash/isNumber';
-import throttle from 'lodash/throttle';
+import {first,isFunction,isNumber,throttle} from '../utils/lodashReplacements';
 
 import XDate from 'xdate';
 

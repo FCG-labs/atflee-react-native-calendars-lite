@@ -1,4 +1,4 @@
-import inRange from 'lodash/inRange';
+import {inRange} from '../utils/lodashReplacements';
 import XDate from 'xdate';
 import constants from '../commons/constants';
 import {Event, PackedEvent} from './EventBlock';

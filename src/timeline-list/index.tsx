@@ -1,6 +1,4 @@
-import throttle from 'lodash/throttle';
-import flatten from 'lodash/flatten';
-import dropRight from 'lodash/dropRight';
+import {throttle,flatten,dropRight} from '../utils/lodashReplacements';
 import React, {useCallback, useContext, useEffect, useMemo, useRef, useState} from 'react';
 import {isToday, generateDay} from '../dateutils';
 import InfiniteList from '../infinite-list';

@@ -1,4 +1,4 @@
-import includes from 'lodash/includes';
+import {includes} from '../../utils/lodashReplacements';
 import XDate from 'xdate';
 
 import React, {Fragment, ReactNode, useCallback, useMemo, forwardRef, useImperativeHandle, useRef} from 'react';

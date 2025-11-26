@@ -4,12 +4,7 @@ import {AgendaProps} from './agenda';
 import {ReservationListProps} from './agenda/reservation-list';
 
 import {MarkingProps} from './calendar/day/marking';
-
-const get = require('lodash/get');
-const omit = require('lodash/omit');
-const pickBy = require('lodash/pickBy');
-const isEqual = require('lodash/isEqual');
-const includes = require('lodash/includes');
+import {get, omit, pickBy, isEqual, includes} from './utils/lodashReplacements';
 
 export function shouldUpdate(props: any, newProps: any, paths: string[]) {
   for (let i = 0; i < paths.length; i++) {

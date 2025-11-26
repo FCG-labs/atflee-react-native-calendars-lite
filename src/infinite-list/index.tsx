@@ -1,6 +1,4 @@
-import inRange from 'lodash/inRange';
-import debounce from 'lodash/debounce';
-import noop from 'lodash/noop';
+import {inRange,debounce,noop} from '../utils/lodashReplacements';
 import React, {forwardRef, useCallback, useEffect, useMemo, useRef} from 'react';
 import {ScrollViewProps} from 'react-native';
 import {DataProvider, LayoutProvider, RecyclerListView, RecyclerListViewProps} from 'recyclerlistview';

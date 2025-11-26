@@ -1,7 +1,6 @@
+import {isUndefined,debounce} from '../../utils/lodashReplacements';
 import PropTypes from 'prop-types';
 
-import isUndefined from 'lodash/isUndefined';
-import debounce from 'lodash/debounce';
 import InfiniteList from '../../infinite-list';
 
 import XDate from 'xdate';

@@ -1,10 +1,6 @@
+import {get,map,isFunction,isUndefined,debounce} from '../../utils/lodashReplacements';
 import PropTypes from 'prop-types';
 
-import get from 'lodash/get';
-import map from 'lodash/map';
-import isFunction from 'lodash/isFunction';
-import isUndefined from 'lodash/isUndefined';
-import debounce from 'lodash/debounce';
 
 import XDate from 'xdate';
 
