@@ -114,22 +114,41 @@ export const findIndex = <T>(
 ): number => (array ?? []).findIndex(predicate);
 
 export const filter = <T>(
-  array: T[] | null | undefined,
-  predicate: (value: T, index: number, array: T[]) => boolean
-): T[] => (array ?? []).filter(predicate);
+  collection: T[] | Record<string, T> | null | undefined,
+  predicate: (value: T, index: number | string) => boolean
+): T[] => {
+  if (!collection) return [];
+  if (Array.isArray(collection)) return collection.filter(predicate);
+  return Object.entries(collection).filter(([k, v]) => predicate(v, k as unknown as number)).map(([, v]) => v);
+};
 
 export const map = <T, R>(
-  array: T[] | null | undefined,
-  iteratee: (value: T, index: number, array: T[]) => R
-): R[] => (array ?? []).map(iteratee);
+  collection: T[] | Record<string, T> | null | undefined,
+  iteratee: (value: T, index: number | string) => R
+): R[] => {
+  if (!collection) return [];
+  if (Array.isArray(collection)) return collection.map(iteratee);
+  return Object.entries(collection).map(([k, v]) => iteratee(v, k as unknown as number));
+};
 
 export const some = <T>(
-  array: T[] | null | undefined,
-  predicate: (value: T, index: number, array: T[]) => boolean
-): boolean => (array ?? []).some(predicate);
+  collection: T[] | Record<string, T> | null | undefined,
+  predicate: (value: T, index: number | string) => boolean
+): boolean => {
+  if (!collection) return false;
+  if (Array.isArray(collection)) return collection.some(predicate);
+  return Object.values(collection).some((v, i) => predicate(v, i));
+};
 
-export const includes = <T>(array: T[] | null | undefined, value: T): boolean =>
-  array?.includes(value) ?? false;
+export const includes = <T>(
+  collection: T[] | Record<string, T> | string | null | undefined,
+  value: T
+): boolean => {
+  if (!collection) return false;
+  if (typeof collection === 'string') return collection.includes(value as unknown as string);
+  if (Array.isArray(collection)) return collection.includes(value);
+  return Object.values(collection).includes(value);
+};
 
 export const min = (array: number[] | null | undefined): number | undefined =>
   array?.length ? Math.min(...array) : undefined;
