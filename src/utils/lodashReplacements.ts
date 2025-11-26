@@ -2,16 +2,52 @@
  * lodash 함수 대체 유틸리티
  * 
  * 전략:
- * - debounce/throttle: lodash-es (옵션 완벽 호환, tree-shakeable)
+ * - debounce/throttle: just-debounce-it + just-throttle (검증된 경량 라이브러리)
  * - isEqual, omit 등: es-toolkit (경량)
  * - 단순 함수: native 구현
  */
 
-// lodash-es: debounce/throttle만 (옵션 완벽 호환 필요)
-export { debounce, throttle } from 'lodash-es';
-
 // es-toolkit: 경량 유틸리티
 export { isEqual, omit, range, groupBy, sortBy, noop } from 'es-toolkit';
+
+// just-debounce-it + just-throttle: lodash 옵션 호환 래퍼
+import justDebounce from 'just-debounce-it';
+import justThrottle from 'just-throttle';
+
+type AnyFunction = (...args: any[]) => any;
+
+interface DebounceOptions {
+  leading?: boolean;
+  trailing?: boolean;
+}
+
+/**
+ * lodash 호환 debounce 래퍼
+ * - {leading: true} → immediate mode
+ * - {leading: false, trailing: true} → 기본 동작 (default)
+ */
+export function debounce<T extends AnyFunction>(
+  func: T,
+  wait = 0,
+  options: DebounceOptions = {}
+): T & { cancel: () => void; flush: () => void } {
+  const immediate = options.leading === true;
+  return justDebounce(func, wait, immediate);
+}
+
+/**
+ * lodash 호환 throttle 래퍼
+ */
+export function throttle<T extends AnyFunction>(
+  func: T,
+  wait = 0,
+  options: { leading?: boolean; trailing?: boolean } = {}
+): T & { cancel: () => void } {
+  return justThrottle(func, wait, {
+    leading: options.leading ?? true,
+    trailing: options.trailing ?? true
+  });
+}
 
 // Native 대체 함수들
 export const isFunction = (value: unknown): value is Function =>

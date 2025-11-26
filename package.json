@@ -40,7 +40,8 @@
   "dependencies": {
     "es-toolkit": "^1.42.0",
     "hoist-non-react-statics": "^3.3.1",
-    "lodash-es": "^4.17.21",
+    "just-debounce-it": "^3.2.0",
+    "just-throttle": "^4.2.0",
     "memoize-one": "^5.2.1",
     "prop-types": "^15.5.10",
     "react-native-safe-area-context": "4.5.0",
