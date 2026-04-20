@@ -2,9 +2,7 @@ import {isEmpty} from '../utils/lodashReplacements';
 import PropTypes from 'prop-types';
 import XDate from 'xdate';
 import React, {useRef, useState, useEffect, useCallback, useMemo} from 'react';
-import {AccessibilityInfo, View, ViewStyle, StyleProp} from 'react-native';
-// @ts-expect-error
-import GestureRecognizer, {swipeDirections} from 'react-native-swipe-gestures';
+import {AccessibilityInfo, View, ViewStyle, StyleProp, GestureResponderEvent} from 'react-native';
 import constants from '../commons/constants';
 import {page, isGTE, isLTE, sameMonth} from '../dateutils';
 import {xdateToData, parseDate, toMarkingFormat} from '../interface';
@@ -156,19 +154,34 @@ const Calendar = (props: CalendarProps & ContextProp) => {
     header.current?.onPressLeft();
   }, [header]);
 
-  const onSwipe = useCallback((gestureName: string) => {
-    const {SWIPE_UP, SWIPE_DOWN, SWIPE_LEFT, SWIPE_RIGHT} = swipeDirections;
+  // JS Responder system detects horizontal swipes and cancels child Pressable touches.
+  // RNGH Gesture.Pan cannot cancel JS Pressable — days get pressed during swipe.
+  const swipeStartRef = useRef<{ x: number; y: number } | null>(null);
 
-    switch (gestureName) {
-      case SWIPE_UP:
-      case SWIPE_DOWN:
-        break;
-      case SWIPE_LEFT:
-        constants.isRTL ? onSwipeRight() : onSwipeLeft();
-        break;
-      case SWIPE_RIGHT:
-        constants.isRTL ? onSwipeLeft() : onSwipeRight();
-        break;
+  const onSwipeTouchStart = useCallback((e: GestureResponderEvent) => {
+    if (!enableSwipeMonths) return;
+    swipeStartRef.current = {
+      x: e.nativeEvent.pageX,
+      y: e.nativeEvent.pageY
+    };
+  }, [enableSwipeMonths]);
+
+  const onSwipeMoveShouldSetResponder = useCallback((e: GestureResponderEvent) => {
+    if (!enableSwipeMonths || !swipeStartRef.current) return false;
+    const dx = e.nativeEvent.pageX - swipeStartRef.current.x;
+    const dy = Math.abs(e.nativeEvent.pageY - swipeStartRef.current.y);
+    // Claim responder on significant horizontal movement
+    return Math.abs(dx) > 20 && dy < 40;
+  }, [enableSwipeMonths]);
+
+  const onSwipeResponderRelease = useCallback((e: GestureResponderEvent) => {
+    if (!swipeStartRef.current) return;
+    const dx = e.nativeEvent.pageX - swipeStartRef.current.x;
+    swipeStartRef.current = null;
+    if (dx < -30) {
+      constants.isRTL ? onSwipeRight() : onSwipeLeft();
+    } else if (dx > 30) {
+      constants.isRTL ? onSwipeLeft() : onSwipeRight();
     }
   }, [onSwipeLeft, onSwipeRight]);
 
@@ -271,24 +284,35 @@ const Calendar = (props: CalendarProps & ContextProp) => {
     );
   };
 
-  const GestureComponent = enableSwipeMonths ? GestureRecognizer : View;
-  const swipeProps = {
-    onSwipe: (direction: string) => onSwipe(direction)
-  };
-  const gestureProps = enableSwipeMonths ? swipeProps : undefined;
+  const calendarContent = (
+    <View
+      style={[style.current.container, propsStyle]}
+      testID={testID}
+      accessibilityElementsHidden={accessibilityElementsHidden} // iOS
+      importantForAccessibility={importantForAccessibility} // Android
+    >
+      {renderHeader()}
+      {renderMonth()}
+    </View>
+  );
+
+  if (enableSwipeMonths) {
+    return (
+      <View
+        testID={`${testID}.container`}
+        onTouchStart={onSwipeTouchStart}
+        onMoveShouldSetResponder={onSwipeMoveShouldSetResponder}
+        onResponderRelease={onSwipeResponderRelease}
+      >
+        {calendarContent}
+      </View>
+    );
+  }
 
   return (
-    <GestureComponent {...gestureProps} testID={`${testID}.container`}>
-      <View
-        style={[style.current.container, propsStyle]}
-        testID={testID}
-        accessibilityElementsHidden={accessibilityElementsHidden} // iOS
-        importantForAccessibility={importantForAccessibility} // Android
-      >
-        {renderHeader()}
-        {renderMonth()}
-      </View>
-    </GestureComponent>
+    <View testID={`${testID}.container`}>
+      {calendarContent}
+    </View>
   );
 };
 
