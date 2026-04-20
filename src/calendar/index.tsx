@@ -166,13 +166,19 @@ const Calendar = (props: CalendarProps & ContextProp) => {
     };
   }, [enableSwipeMonths]);
 
+  // Capture phase: never claim responder on touch start — let children (days) handle taps.
+  const onSwipeStartShouldSetResponderCapture = useCallback(() => false, []);
+
   const onSwipeMoveShouldSetResponder = useCallback((e: GestureResponderEvent) => {
     if (!enableSwipeMonths || !swipeStartRef.current) return false;
     const dx = e.nativeEvent.pageX - swipeStartRef.current.x;
     const dy = Math.abs(e.nativeEvent.pageY - swipeStartRef.current.y);
-    // Claim responder on significant horizontal movement
+    // Claim responder on significant horizontal movement (capture phase — preempts child Pressable).
     return Math.abs(dx) > 20 && dy < 40;
   }, [enableSwipeMonths]);
+
+  // Deny termination: once we own the responder (swipe in progress), don't let children steal it back.
+  const onSwipeResponderTerminationRequest = useCallback(() => false, []);
 
   const onSwipeResponderRelease = useCallback((e: GestureResponderEvent) => {
     if (!swipeStartRef.current) return;
@@ -301,8 +307,10 @@ const Calendar = (props: CalendarProps & ContextProp) => {
       <View
         testID={`${testID}.container`}
         onTouchStart={onSwipeTouchStart}
-        onMoveShouldSetResponder={onSwipeMoveShouldSetResponder}
+        onStartShouldSetResponderCapture={onSwipeStartShouldSetResponderCapture}
+        onMoveShouldSetResponderCapture={onSwipeMoveShouldSetResponder}
         onResponderRelease={onSwipeResponderRelease}
+        onResponderTerminationRequest={onSwipeResponderTerminationRequest}
       >
         {calendarContent}
       </View>
